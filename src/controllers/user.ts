@@ -1,19 +1,38 @@
 import { Request, Response } from "express";
-import { IUser } from "../interface/user";
-import { generateId, userDatabase } from "../database/database";
+import { UserServices } from "../services/user";
 
 export class UserController {
 
   createUser(req: Request, res: Response): Response {
-    const newUser: IUser = {
-      id: generateId(),
-      name: req.body.name,
-      email: req.body.email
-    };
+    const userServices = new UserServices();
+    
+    const response = userServices.createUser(req.body.name, req.body.email);
 
-    userDatabase.push(newUser);
+    return res.status(201).json(response);
+  }
 
-    return res.status(201).json(newUser);
+  getUsers(req: Request, res: Response): Response {
+    const userServices = new UserServices();
+
+    const response = userServices.getUsers();
+
+    return res.status(200).json(response);
+  }
+
+  getUser(req: Request, res: Response): Response {
+    const userServices = new UserServices();
+
+    const response = userServices.getUser(Number(res.locals.user.id));
+
+    return res.status(302).json(response);
+  }
+
+  deleteUser(req: Request, res: Response): Response {
+    const userServices = new UserServices();
+
+    userServices.deleteUser(Number(res.locals.user.id));
+
+    return res.status(200).send();
   }
 
 }
